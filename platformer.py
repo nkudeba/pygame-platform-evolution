@@ -170,7 +170,7 @@ while True:
 
     # Projectile shot when pressing 's'
     if keys[pygame.K_s]:
-        projectiles.add(Projectile(stickman.rect.x, stickman.rect.y + 20, [stickman.velocity[0],0]))
+        projectiles.add(Projectile(stickman.rect.x, stickman.rect.y + 20, [(stickman.velocity[0]+ 0.0001)/abs(stickman.velocity[0] + 0.0001) * 20,0]))
 
 
     if stickman.on_moving_bar and bar_collision:
