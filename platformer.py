@@ -29,7 +29,8 @@ class Stickman(pygame.sprite.Sprite):
         # self.image.fill([random_red, random_green, random_blue])
         picture = pygame.image.load('player2.png')  # load the star image
         self.image = pygame.transform.scale(picture, (30.2, 55.9))
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect() 
+        self.elapsedTime = pygame.time.get_ticks()
         self.rect.x = x
         self.rect.y = y
         self.velocity = [0, 0]
@@ -40,6 +41,7 @@ class Stickman(pygame.sprite.Sprite):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
         self.velocity[1] += 1  # Gravity
+        self.elapsedTime = pygame.time.get_ticks()
 
 class Fish(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity = [0, 0], name = fish_count + 1):
@@ -51,6 +53,7 @@ class Fish(pygame.sprite.Sprite):
         picture = pygame.image.load('fish_image.png')  # load the fish image
         fishWidth = 30
         fishHeight = 30
+        self.elapsedTime = pygame.time.get_ticks()
         self.image = pygame.transform.scale(picture, (fishWidth, fishHeight))
         self.rect = self.image.get_rect()
         self.rect.x = x
@@ -67,11 +70,22 @@ class Fish(pygame.sprite.Sprite):
         self.velocity[0] += xvel
         self.velocity[1] += yvel
 
-    def update(self):
-        self.automate_movement()
+    c1ax = random.randint (-5, 5) * 0.001
+    c2ax = random.randint (-5, 5) * 0.001
+    c3ax = random.randint (-5, 5) * 0.001
+    c1ay = random.randint (-5, 5) * 0.001
+    c2ay = random.randint (-5, 5) * 0.001
+    c3ay = random.randint (-5, 5) * 0.001
+    print(str(c1ax) + " " + str(c2ax) + " " + str(c3ax) + " " + str(c1ay) + " " + str(c2ay) + " " + str(c3ay))
+
+    def update(self, c1ax = c1ax, c2ax = c2ax, c3ax = c3ax, c1ay = c1ay, c2ay = c2ay, c3ay = c3ay):
+        # self.automate_movement()
+        t = self.elapsedTime = pygame.time.get_ticks() / 100
+        self.velocity[0] = c1ax * t * t + c2ax * t * c3ax
+        self.velocity[1] = c1ay * t * t + c2ay * t + c3ay
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-        self.velocity[1] += 1  # Gravity
+        # self.velocity[1] += 1  # Gravity
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, x, y, velocity = [4, 0]):
@@ -302,6 +316,8 @@ while True:
     for projectile in projectiles:
         screen.blit(projectile.image, projectile.rect)             
     score_text = font.render("Score: " + str(stickman.score), True, Text_Color)
+    time_text = font.render("Time: " + str(stickman.elapsedTime), True, Text_Color)
     screen.blit(score_text, (WIDTH - 170, 10))
+    screen.blit(time_text, (WIDTH - 170, 40))
     pygame.display.flip()
     clock.tick(FPS)
