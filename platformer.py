@@ -151,7 +151,7 @@ rightplatforms = pygame.sprite.Group()
 rightplatforms.add(Platform(WIDTH - 10, 0, 50, HEIGHT))
 moving_bars = pygame.sprite.Group()
 moving_bars.add(MovingBar(100, HEIGHT - 100, 100, 10, 3))
-moving_bars.add(MovingBar(150, HEIGHT - 200, 100, 10, 2.5))
+moving_bars.add(MovingBar(150, HEIGHT - 300, 100, 10, 2.5))
 stars = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
 stars.add(Star(100, 100, [0,0]))
@@ -251,6 +251,12 @@ while True:
         for fish, platform in rightplatform_fish_collision.items():
             fish.velocity[0] = 0
             fish.rect.x = WIDTH - 40
+
+    bars_right_collision = pygame.sprite.groupcollide(moving_bars, rightplatforms, False, False, pygame.sprite.collide_mask)
+    if bars_right_collision:
+        for bar, platform in bars_right_collision.items():
+            print(bar.speed)
+            bar.rect.x = WIDTH - 110
 
     topplatform_fish_collision = pygame.sprite.groupcollide(fishes, topplatforms, False, False, pygame.sprite.collide_mask)
     if topplatform_fish_collision:
