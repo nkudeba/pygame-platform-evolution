@@ -133,6 +133,7 @@ class MovingBar(Platform):
     def __init__(self, x, y, width, height, speed):
         super().__init__(x, y, width, height)
         self.speed = speed
+        self.width = width
 
     def update(self):
         self.rect.x += self.speed
@@ -255,8 +256,7 @@ while True:
     bars_right_collision = pygame.sprite.groupcollide(moving_bars, rightplatforms, False, False, pygame.sprite.collide_mask)
     if bars_right_collision:
         for bar, platform in bars_right_collision.items():
-            print(bar.speed)
-            bar.rect.x = WIDTH - 110
+            bar.rect.x = platform[0].rect.x - bar.width
 
     topplatform_fish_collision = pygame.sprite.groupcollide(fishes, topplatforms, False, False, pygame.sprite.collide_mask)
     if topplatform_fish_collision:
