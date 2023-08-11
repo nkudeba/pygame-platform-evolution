@@ -22,14 +22,18 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Stickman Platform Game")
 fish_count = 0
 
-# Stickman class
-class Stickman(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super().__init__()
-        # self.image.fill([random_red, random_green, random_blue])
-        picture = pygame.image.load('player2.png')  # load the star image
-        self.image = pygame.transform.scale(picture, (30.2, 55.9))
-        self.rect = self.image.get_rect() 
+
+# Function to load and scale image
+def load_and_scale_image(image_path, width, height):
+    picture = pygame.image.load(image_path)
+    return pygame.transform.scale(picture, (width, height))
+
+
+class Character(pygame.sprite.Sprite):
+    def __init__(self, x, y, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
         self.elapsedTime = pygame.time.get_ticks()
         self.rect.x = x
         self.rect.y = y
@@ -43,9 +47,15 @@ class Stickman(pygame.sprite.Sprite):
         self.velocity[1] += 1  # Gravity
         self.elapsedTime = pygame.time.get_ticks()
 
-class Fish(pygame.sprite.Sprite):
-    def __init__(self, x, y, velocity = [0, 0], name = fish_count + 1):
-        super().__init__()        
+# Stickman class
+class Stickman(Character):
+    def __init__(self, x, y):
+        image = load_and_scale_image('player2.png', 30, 55) 
+        super().__init__(x, y, image)
+
+
+class Fish(Character):
+    def __init__(self, x, y, velocity = [0, 0], name = fish_count + 1):  
         random_red    = random.randint( 50, 250 )
         random_green  = random.randint( 50, 250 )
         random_blue   = random.randint( 50, 250 )
@@ -56,15 +66,12 @@ class Fish(pygame.sprite.Sprite):
         self.elapsedTime = pygame.time.get_ticks()
         self.image = pygame.transform.scale(picture, (fishWidth, fishHeight))
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
         self.name = "fish " + str(name)
         fish_scales= pygame.Surface( ( fishWidth, fishHeight ) )
         fish_scales.fill( random_colour )
         fish_scales.blit( self.image, (0,0) )
-        self.image = fish_scales
-        self.velocity = [0, 0]
-        self.on_moving_bar = False
+        self.image = fish_scales        
+        super().__init__(x, y, self.image)
         self.score = 0
     def automate_movement(self, xvel = random.randint (-1, 1), yvel = random.randint (-1, 1)):
         self.velocity[0] += xvel
