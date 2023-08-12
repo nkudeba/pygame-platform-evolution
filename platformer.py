@@ -253,14 +253,10 @@ while True:
 
 
     # Check for collisions with platforms
-    check_collision(stickman, horiplatforms)
-    check_collision(stickman, topplatforms)
-    check_collision(stickman, vertplatforms)
-    check_collision(stickman, rightplatforms)
-    check_collision(fishes, horiplatforms)
-    check_collision(fishes, vertplatforms)
-    check_collision(fishes, rightplatforms)
-    check_collision(fishes, topplatforms)
+    platforms = [horiplatforms, topplatforms, vertplatforms, rightplatforms]
+    for platform in platforms:
+        check_collision(stickman, platform)
+        check_collision(fishes, platform)
     
 
     bars_right_collision = pygame.sprite.groupcollide(moving_bars, rightplatforms, False, False, pygame.sprite.collide_mask)
