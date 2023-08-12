@@ -195,6 +195,12 @@ def platform_collisions(object, platform):
     elif platform is rightplatforms:
         object.velocity[0] = 0
         object.rect.x = WIDTH - object.width - 10
+        
+def fish_star_collision(fishes, stars):
+    collisions = pygame.sprite.groupcollide(fishes, stars, False, True)
+    for fish, collided_stars in collisions.items():
+        fish.score += 100 * len(collided_stars)
+
 
 
 def barCollision(object, moving_bars):
@@ -255,6 +261,7 @@ while True:
         check_collision(stickman, platform)
         check_collision(fishes, platform)
     
+    fish_star_collision(fishes, stars)
 
     bars_right_collision = pygame.sprite.groupcollide(moving_bars, rightplatforms, False, False, pygame.sprite.collide_mask)
     if bars_right_collision:
@@ -302,3 +309,5 @@ while True:
     toupdate = [stickman, moving_bars, stars, projectiles, fishes]
     for object in toupdate:
         object.update()
+
+
