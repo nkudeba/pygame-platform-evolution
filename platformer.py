@@ -155,17 +155,13 @@ projectiles = pygame.sprite.Group()
 starlist = [[100, 100], [150, 50], [100, 471], [500, 200], [120, 421]]
 for star in starlist:
     stars.add(Star(star[0], star[1], [0, 0]))
-    
+
 players = pygame.sprite.Group()
 # players.add(Stickman(100, HEIGHT - 50))
 fishes = pygame.sprite.Group()
-fishes.add(Fish(540, HEIGHT-50))
-fish_count += 1
-fishes.add(Fish(100, HEIGHT-50))
-fish_count += 1
-fishes.add(Fish(200, HEIGHT-50))
-fish_count += 1
-fishes.add(Fish(300, HEIGHT-50))
+fishlist = [540, 100, 200, 300]
+for fish in fishlist:
+    fishes.add(Fish(fish, HEIGHT-50))
 
 # Main game loop
 clock = pygame.time.Clock()
