@@ -62,11 +62,12 @@ class Stickman(Character):
 
 
 class Fish(Character):
-    def __init__(self, x, y, c1ax, c2ax, c3ax, c1ay, c2ay, c3ay, velocity = [0, 0], name = fish_count + 1):  
+    def __init__(self, x, y, c1ax, c2ax, c3ax, c1ay, c2ay, c3ay, name, velocity = [0, 0]):  
         fishWidth = 30
         fishHeight = 30
         self.elapsedTime = pygame.time.get_ticks()        
-        self.fish_image(fishWidth, fishHeight)        
+        self.fish_image(fishWidth, fishHeight)
+        self.number = name        
         self.name = "fish " + str(name)   
         super().__init__(x, y, self.image)
         self.score = 0
@@ -155,7 +156,7 @@ moving_bars.add(MovingBar(100, HEIGHT - 100, 100, 10, 3))
 moving_bars.add(MovingBar(150, HEIGHT - 300, 100, 10, 2.5))
 stars = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
-starlist = [[100, 100], [150, 50], [100, 471], [500, 200], [120, 421]]
+starlist = [[100, 100], [150, 50], [100, 471], [500, 200], [120, 421], [400, 400]]
 for star in starlist:
     stars.add(Star(star[0], star[1], [0, 0]))
 
@@ -164,7 +165,9 @@ players = pygame.sprite.Group()
 fishes = pygame.sprite.Group()
 fishlist = [540, 100, 200, 300]
 for fish in fishlist:
-    fishes.add(Fish(fish, HEIGHT-50, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001))
+    fishes.add(Fish(fish, HEIGHT-50, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, fish_count + 1))
+    print(fish_count)
+    fish_count += 1
 
 # Main game loop
 clock = pygame.time.Clock()
@@ -300,6 +303,11 @@ while True:
             screen.blit(object.image, object.rect)           
     score_text = font.render("Score: " + str(stickman.score), True, Text_Color)
     time_text = font.render("Time: " + str(stickman.elapsedTime), True, Text_Color)
+    for fish in fishes:
+        fish_score = font.render(str(fish.name) + " score: " + str(fish.score), True, Text_Color)
+        screen.blit(fish_score, (WIDTH - 200, 40 + fish.number * 30))
+
+    
     screen.blit(score_text, (WIDTH - 170, 10))
     screen.blit(time_text, (WIDTH - 170, 40))
     pygame.display.flip()
