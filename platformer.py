@@ -62,7 +62,7 @@ class Stickman(Character):
 
 
 class Fish(Character):
-    def __init__(self, x, y, velocity = [0, 0], name = fish_count + 1):  
+    def __init__(self, x, y, c1ax, c2ax, c3ax, c1ay, c2ay, c3ay, velocity = [0, 0], name = fish_count + 1):  
         fishWidth = 30
         fishHeight = 30
         self.elapsedTime = pygame.time.get_ticks()        
@@ -70,6 +70,12 @@ class Fish(Character):
         self.name = "fish " + str(name)   
         super().__init__(x, y, self.image)
         self.score = 0
+        self.c1ax = c1ax
+        self.c2ax = c2ax
+        self.c3ax = c3ax
+        self.c1ay = c1ay
+        self.c2ay = c2ay
+        self.c3ay = c3ay
 
     def fish_image(self, fishWidth, fishHeight):
         random_red    = random.randint( 50, 250 )
@@ -86,16 +92,15 @@ class Fish(Character):
         self.velocity[0] += xvel
         self.velocity[1] += yvel
 
-    c1ax = random.randint (-5, 5) * 0.001
-    c2ax = random.randint (-5, 5) * 0.001
-    c3ax = random.randint (-5, 5) * 0.001
-    c1ay = random.randint (-5, 5) * 0.001
-    c2ay = random.randint (-5, 5) * 0.001
-    c3ay = random.randint (-5, 5) * 0.001
-    print(str(c1ax) + " " + str(c2ax) + " " + str(c3ax) + " " + str(c1ay) + " " + str(c2ay) + " " + str(c3ay))
 
-    def update(self, c1ax = c1ax, c2ax = c2ax, c3ax = c3ax, c1ay = c1ay, c2ay = c2ay, c3ay = c3ay):
+    def update(self):
         # self.automate_movement()
+        c1ax = self.c1ax
+        c2ax = self.c2ax
+        c3ax = self.c3ax
+        c1ay = self.c1ay
+        c2ay = self.c2ay
+        c3ay = self.c3ay
         t = self.elapsedTime = pygame.time.get_ticks() / 100
         self.velocity[0] = c1ax * t * t + c2ax * t * c3ax
         self.velocity[1] = c1ay * t * t + c2ay * t + c3ay
@@ -159,7 +164,7 @@ players = pygame.sprite.Group()
 fishes = pygame.sprite.Group()
 fishlist = [540, 100, 200, 300]
 for fish in fishlist:
-    fishes.add(Fish(fish, HEIGHT-50))
+    fishes.add(Fish(fish, HEIGHT-50, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001))
 
 # Main game loop
 clock = pygame.time.Clock()
@@ -203,7 +208,6 @@ def barCollision(object, moving_bars):
             handleBarCollision(object, bar_collision, bar)
         else:
             for object, bars in bar_collision.items():
-                print('fish bar collide')
                 bar = bars[0]
                 handleBarCollision(object, bar_collision, bar)
                 
