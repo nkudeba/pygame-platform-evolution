@@ -197,7 +197,7 @@ def platform_collisions(object, platform):
         object.rect.x = WIDTH - object.width - 10
         
 def fish_star_collision(fishes, stars):
-    collisions = pygame.sprite.groupcollide(fishes, stars, False, True)
+    collisions = pygame.sprite.groupcollide(fishes, stars, False, True, pygame.sprite.collide_mask)
     for fish, collided_stars in collisions.items():
         fish.score += 100 * len(collided_stars)
 
