@@ -139,14 +139,12 @@ class MovingBar(Platform):
 
 # Create game objects
 stickman = Stickman(40, HEIGHT-50)
-horiplatforms = pygame.sprite.Group()
-horiplatforms.add(Platform(0, HEIGHT - 10, WIDTH, 10))
-topplatforms = pygame.sprite.Group()
-topplatforms.add(Platform(0, 0, WIDTH, 10))
-vertplatforms = pygame.sprite.Group()
-vertplatforms.add(Platform(-40, 0, 50, HEIGHT))
-rightplatforms = pygame.sprite.Group()
-rightplatforms.add(Platform(WIDTH - 10, 0, 50, HEIGHT))
+
+platformNames = [['horiplatforms', [0, HEIGHT - 10, WIDTH, 10]], ['topplatforms',[0, 0, WIDTH, 10]], ['vertplatforms', [-40, 0, 50, HEIGHT]], ['rightplatforms',[WIDTH - 10, 0, 50, HEIGHT]]]
+for platform in platformNames:
+    globals()[platform[0]] = pygame.sprite.Group()
+    globals()[platform[0]].add(Platform( platform[1][0], platform[1][1], platform[1][2], platform[1][3]))
+
 moving_bars = pygame.sprite.Group()
 moving_bars.add(MovingBar(100, HEIGHT - 100, 100, 10, 3))
 moving_bars.add(MovingBar(150, HEIGHT - 300, 100, 10, 2.5))
