@@ -200,27 +200,35 @@ def platform_collisions(object, platform):
 
 
 def barCollision(object, moving_bars):
-    bar_collision = pygame.sprite.spritecollide(object, moving_bars, False)
+    if isinstance(object,Stickman):
+        bar_collision = pygame.sprite.spritecollide(object, moving_bars, False)
+    else:
+        bar_collision = pygame.sprite.groupcollide(object, moving_bars, False, False, pygame.sprite.collide_mask)
     if bar_collision:
         if isinstance(object, Stickman):
             bar = bar_collision[0]
             handleBarCollision(object, bar_collision, bar)
         else:
-            for object, bar in bar_collision.items():
-                # handleBarCollision(object, bar_collision, bar)
+            for object, bars in bar_collision.items():
                 print('fish bar collide')
+                bar = bars[0]
+                handleBarCollision(object, bar_collision, bar)
+                
 
 def handleBarCollision(object, bar_collision, bar):
     if object.on_moving_bar and bar_collision:
         object.rect.x += bar.speed # Move with the bar
         object.velocity[0] += bar.speed
+        print('moving on bar')
     if object.velocity[1] > 0:  # Landing on the bar
         object.rect.y = bar.rect.y - object.rect.height
         object.velocity[1] = 0
         object.on_moving_bar = True
+        print('landed on bar')
     elif object.velocity[1] < 0:  # Hitting the bar from below
         object.rect.y = bar.rect.y + bar.rect.height + 5
         object.velocity[1] = 0
+        print('hit bar from below')
 
 while True:
     for event in pygame.event.get():
@@ -283,7 +291,7 @@ while True:
 
     # Check for collisions with moving bars
     barCollision(stickman, moving_bars)
-    # barCollision(fishes, moving_bars) # Need to make this work - Group object has no attribute 'rect'
+    barCollision(fishes, moving_bars) # Need to make this work - Group object has no attribute 'rect'
 
 
     # Draw game objects
