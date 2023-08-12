@@ -104,8 +104,8 @@ class Fish(Character):
         c2ay = self.c2ay
         c3ay = self.c3ay
         t = self.elapsedTime = pygame.time.get_ticks() / 100
-        self.velocity[0] = c1ax * t * t - c1ax * math.exp(-t)  + c2ax * t * c3ax
-        self.velocity[1] = c1ay * t * t - c1ax * math.exp(-t) + c2ay * t + c3ay
+        self.velocity[0] = c1ax * t * t - c1ax * math.exp(-t)  + c2ax * t * c3ax + c3ax * math.sin(t) - c2ax * c3ax/(c1ax * t * t * t + 0.001)
+        self.velocity[1] = c1ay * t * t - c1ay * math.exp(-t) + c2ay * t + c3ay + c3ay * math.sin(t) - c2ay * c3ay/(c1ay * t * t * t + 0.001)
         self.basicUpdate()
         # self.velocity[1] += 1  # Gravity
 
