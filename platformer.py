@@ -152,11 +152,10 @@ moving_bars.add(MovingBar(100, HEIGHT - 100, 100, 10, 3))
 moving_bars.add(MovingBar(150, HEIGHT - 300, 100, 10, 2.5))
 stars = pygame.sprite.Group()
 projectiles = pygame.sprite.Group()
-stars.add(Star(100, 100, [0,0]))
-stars.add(Star(150, 50, [0,0]))
-stars.add(Star(100, 471, [0,0]))
-stars.add(Star(500, 200, [0,0]))
-stars.add(Star(120, 421, [0, 0]))
+starlist = [[100, 100], [150, 50], [100, 471], [500, 200], [120, 421]]
+for star in starlist:
+    stars.add(Star(star[0], star[1], [0, 0]))
+    
 players = pygame.sprite.Group()
 # players.add(Stickman(100, HEIGHT - 50))
 fishes = pygame.sprite.Group()
