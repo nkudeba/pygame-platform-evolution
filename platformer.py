@@ -40,39 +40,48 @@ class Character(pygame.sprite.Sprite):
         self.velocity = [0, 0]
         self.on_moving_bar = False
         self.score = 0
+        self.width = self.image.get_width()
+        self.height = self.image.get_height()
 
     def update(self):
+        self.basicUpdate()
+
+    def basicUpdate(self):
         self.rect.x += self.velocity[0]
         self.rect.y += self.velocity[1]
-        self.velocity[1] += 1  # Gravity
-        self.elapsedTime = pygame.time.get_ticks()
 
 # Stickman class
 class Stickman(Character):
     def __init__(self, x, y):
         image = load_and_scale_image('player2.png', 30, 55) 
         super().__init__(x, y, image)
+    def update(self):
+        self.basicUpdate()        
+        self.velocity[1] += 1  # Gravity
+        self.elapsedTime = pygame.time.get_ticks()
 
 
 class Fish(Character):
     def __init__(self, x, y, velocity = [0, 0], name = fish_count + 1):  
+        fishWidth = 30
+        fishHeight = 30
+        self.elapsedTime = pygame.time.get_ticks()        
+        self.fish_image(fishWidth, fishHeight)        
+        self.name = "fish " + str(name)   
+        super().__init__(x, y, self.image)
+        self.score = 0
+
+    def fish_image(self, fishWidth, fishHeight):
         random_red    = random.randint( 50, 250 )
         random_green  = random.randint( 50, 250 )
         random_blue   = random.randint( 50, 250 )
         random_colour = ( random_red, random_green, random_blue )
-        picture = pygame.image.load('fish_image.png')  # load the fish image
-        fishWidth = 30
-        fishHeight = 30
-        self.elapsedTime = pygame.time.get_ticks()
-        self.image = pygame.transform.scale(picture, (fishWidth, fishHeight))
+        self.image = load_and_scale_image('fish_image.png', fishWidth, fishHeight)
         self.rect = self.image.get_rect()
-        self.name = "fish " + str(name)
         fish_scales= pygame.Surface( ( fishWidth, fishHeight ) )
         fish_scales.fill( random_colour )
         fish_scales.blit( self.image, (0,0) )
-        self.image = fish_scales        
-        super().__init__(x, y, self.image)
-        self.score = 0
+        self.image = fish_scales
     def automate_movement(self, xvel = random.randint (-1, 1), yvel = random.randint (-1, 1)):
         self.velocity[0] += xvel
         self.velocity[1] += yvel
@@ -90,50 +99,31 @@ class Fish(Character):
         t = self.elapsedTime = pygame.time.get_ticks() / 100
         self.velocity[0] = c1ax * t * t + c2ax * t * c3ax
         self.velocity[1] = c1ay * t * t + c2ay * t + c3ay
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
+        self.basicUpdate()
         # self.velocity[1] += 1  # Gravity
 
-class Projectile(pygame.sprite.Sprite):
+class Projectile(Character):
     def __init__(self, x, y, velocity = [4, 0]):
-        super().__init__()
         self.image = pygame.Surface((10, 2))
         self.image.fill(BLACK)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        super().__init__(x, y, self.image)
         self.velocity = velocity
         self.on_moving_bar = False
-    def update(self):
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
 
 
 # Platform class
-class Platform(pygame.sprite.Sprite):
+class Platform(Character):
     def __init__(self, x, y, width, height):
-        super().__init__()
         self.image = pygame.Surface((width, height))
         self.image.fill(BLACK)
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        super().__init__(x, y, self.image)
 
 # Star class
-class Star(pygame.sprite.Sprite):
+class Star(Character):
     def __init__(self, x, y, velocity = [0, 0]):
-        super().__init__()
-        picture = pygame.image.load('star.png')  # load the star image
-        self.image = pygame.transform.scale(picture, (30, 30))
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.image = load_and_scale_image('star.png', 30, 30)
+        super().__init__(x, y, self.image)
         self.velocity = velocity
-        self.on_moving_bar = False
-    def update(self):
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
-
 
 # Moving bar class
 class MovingBar(Platform):
@@ -180,6 +170,57 @@ fishes.add(Fish(300, HEIGHT-50))
 
 # Main game loop
 clock = pygame.time.Clock()
+              
+
+def check_collision(object, platform):
+    if isinstance(object, Stickman):
+        collision = pygame.sprite.spritecollide(object, platform, False)
+    else:
+        collision = pygame.sprite.groupcollide(object, platform, False, False, pygame.sprite.collide_mask)
+    if collision:
+        if isinstance(object, Stickman):
+            platform_collisions(object, platform)
+        else:
+            for object, myplatform in collision.items():
+                platform_collisions(object, platform)
+
+def platform_collisions(object, platform):
+    if platform is horiplatforms:                
+        object.velocity[1] = 0
+        object.rect.y = HEIGHT - object.height - 10
+    elif platform is topplatforms:
+        object.velocity[1] = 0
+        object.rect.y = 10
+    elif platform is vertplatforms:
+        object.velocity[0] = 0
+        object.rect.x = 10
+    elif platform is rightplatforms:
+        object.velocity[0] = 0
+        object.rect.x = WIDTH - object.width - 10
+
+
+def barCollision(object, moving_bars):
+    bar_collision = pygame.sprite.spritecollide(object, moving_bars, False)
+    if bar_collision:
+        if isinstance(object, Stickman):
+            bar = bar_collision[0]
+            handleBarCollision(object, bar_collision, bar)
+        else:
+            for object, bar in bar_collision.items():
+                # handleBarCollision(object, bar_collision, bar)
+                print('fish bar collide')
+
+def handleBarCollision(object, bar_collision, bar):
+    if object.on_moving_bar and bar_collision:
+        object.rect.x += bar.speed # Move with the bar
+        object.velocity[0] += bar.speed
+    if object.velocity[1] > 0:  # Landing on the bar
+        object.rect.y = bar.rect.y - object.rect.height
+        object.velocity[1] = 0
+        object.on_moving_bar = True
+    elif object.velocity[1] < 0:  # Hitting the bar from below
+        object.rect.y = bar.rect.y + bar.rect.height + 5
+        object.velocity[1] = 0
 
 while True:
     for event in pygame.event.get():
@@ -194,86 +235,33 @@ while True:
     if keys[pygame.K_s]:
         projectiles.add(Projectile(stickman.rect.x, stickman.rect.y + 20, [(stickman.velocity[0]+ 0.0001)/abs(stickman.velocity[0] + 0.0001) * 20,0]))
 
-
-    if stickman.on_moving_bar and bar_collision:
-        stickman.velocity[0] += bar.speed
+    if keys[pygame.K_LEFT]:
+        stickman.velocity[0] = -5
+    elif keys[pygame.K_RIGHT]:
+        stickman.velocity[0] = 5
     else:
-        if keys[pygame.K_LEFT]:
-            stickman.velocity[0] = -5
-        elif keys[pygame.K_RIGHT]:
-            stickman.velocity[0] = 5
-        else:
-            stickman.velocity[0] = 0
+        stickman.velocity[0] = 0
 
     if keys[pygame.K_SPACE]:
         stickman.velocity[1] = -15
         stickman.on_moving_bar = False
 
-    # Update game objects
-    stickman.update()
-    moving_bars.update()
-    stars.update()
-    projectiles.update()
-    fishes.update()
 
     # Check for collisions with platforms
-    horiplatform_collision = pygame.sprite.spritecollide(stickman, horiplatforms, False)
-    if horiplatform_collision:
-        # print("Hit bottom")
-        stickman.rect.y = horiplatform_collision[0].rect.y - stickman.rect.height
-        stickman.velocity[1] = 0
-
-    topplatforms_collision = pygame.sprite.spritecollide(stickman, topplatforms, False)
-    if topplatforms_collision:
-        # print("Hit top")
-        stickman.rect.y = 40
-        stickman.velocity[1] = 0
+    check_collision(stickman, horiplatforms)
+    check_collision(stickman, topplatforms)
+    check_collision(stickman, vertplatforms)
+    check_collision(stickman, rightplatforms)
+    check_collision(fishes, horiplatforms)
+    check_collision(fishes, vertplatforms)
+    check_collision(fishes, rightplatforms)
+    check_collision(fishes, topplatforms)
     
-    vertplatform_collision = pygame.sprite.spritecollide(stickman, vertplatforms, False)
-    if vertplatform_collision:
-        print("Hit side")
-        stickman.rect.x = 10
-        stickman.velocity[0] = 0
-    # if stickman.rect.x == 0:
-    #     stickman.velocity[0] = 0
-    #     stickman.rect.x == 1
-    rightplatform_collision = pygame.sprite.spritecollide(stickman, rightplatforms, False)
-    if rightplatform_collision:
-        print("Hit right side")
-        stickman.rect.x = WIDTH - 40
-        stickman.velocity[0] = 0
-
-    platform_fish_collision = pygame.sprite.groupcollide(fishes, horiplatforms, False, False, pygame.sprite.collide_mask)
-    if platform_fish_collision:
-        for fish, platform in platform_fish_collision.items():
-            fish.velocity[1] = 0
-            fish.rect.y = HEIGHT - 40
-
-    vertplatform_fish_collision = pygame.sprite.groupcollide(fishes, vertplatforms, False, False, pygame.sprite.collide_mask)
-    if vertplatform_fish_collision:
-        for fish, platform in vertplatform_fish_collision.items():
-            fish.velocity[0] = 0
-            fish.rect.x = 10
-    rightplatform_fish_collision = pygame.sprite.groupcollide(fishes, rightplatforms, False, False, pygame.sprite.collide_mask)
-    if rightplatform_fish_collision:
-        for fish, platform in rightplatform_fish_collision.items():
-            fish.velocity[0] = 0
-            fish.rect.x = WIDTH - 40
 
     bars_right_collision = pygame.sprite.groupcollide(moving_bars, rightplatforms, False, False, pygame.sprite.collide_mask)
     if bars_right_collision:
         for bar, platform in bars_right_collision.items():
             bar.rect.x = platform[0].rect.x - bar.width
-
-    topplatform_fish_collision = pygame.sprite.groupcollide(fishes, topplatforms, False, False, pygame.sprite.collide_mask)
-    if topplatform_fish_collision:
-        for fish, platform in topplatform_fish_collision.items():
-            fish.velocity[1] = 0
-            fish.rect.y = 30
-
-    # Check for collision with edges
-    if stickman.rect.x == 0:
-        stickman.velocity[0] = 0
     
     star_collision = pygame.sprite.spritecollide(stickman, stars, True, pygame.sprite.collide_mask)
     if star_collision:
@@ -294,43 +282,25 @@ while True:
         print("star player collision")
 
     # Check for collisions with moving bars
-    bar_collision = pygame.sprite.spritecollide(stickman, moving_bars, False)
-    if bar_collision:
-        bar = bar_collision[0]
-        if stickman.velocity[1] > 0:  # Landing on the bar
-            stickman.rect.y = bar.rect.y - stickman.rect.height
-            stickman.velocity[1] = 0
-            stickman.on_moving_bar = True
-        elif stickman.velocity[1] < 0:  # Hitting the bar from below
-            stickman.rect.y = bar.rect.y + bar.rect.height + 5
-            stickman.velocity[1] = 0
+    barCollision(stickman, moving_bars)
+    # barCollision(fishes, moving_bars) # Need to make this work - Group object has no attribute 'rect'
 
-    # Move with the moving bar
-    if stickman.on_moving_bar and bar_collision:
-        stickman.rect.x += stickman.velocity[0] + bar.speed
 
     # Draw game objects
     screen.fill(WHITE)
     screen.blit(stickman.image, stickman.rect)
-    for platform in horiplatforms:
-        screen.blit(platform.image, platform.rect)
-    for platform in vertplatforms:
-        screen.blit(platform.image, platform.rect)
-    for platform in rightplatforms:
-        screen.blit(platform.image, platform.rect)
-    for platform in topplatforms:
-        screen.blit(platform.image, platform.rect)
-    for moving_bar in moving_bars:
-        screen.blit(moving_bar.image, moving_bar.rect)
-    for star in stars:
-        screen.blit(star.image, star.rect)
-    for fish in fishes:
-        screen.blit(fish.image, fish.rect)
-    for projectile in projectiles:
-        screen.blit(projectile.image, projectile.rect)             
+    tobuild = [horiplatforms, vertplatforms, rightplatforms, topplatforms, moving_bars, stars, fishes, projectiles]
+    for group in tobuild:
+        for object in group:
+            screen.blit(object.image, object.rect)           
     score_text = font.render("Score: " + str(stickman.score), True, Text_Color)
     time_text = font.render("Time: " + str(stickman.elapsedTime), True, Text_Color)
     screen.blit(score_text, (WIDTH - 170, 10))
     screen.blit(time_text, (WIDTH - 170, 40))
     pygame.display.flip()
     clock.tick(FPS)
+
+    # Update game objects
+    toupdate = [stickman, moving_bars, stars, projectiles, fishes]
+    for object in toupdate:
+        object.update()
