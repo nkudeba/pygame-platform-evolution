@@ -97,6 +97,10 @@ class Fish(Character):
 
     def update(self):
         # self.automate_movement()
+        # To do:
+        # In update loop, get x and y distance to every bar, star, stickman, and platform, as well as the speed/velocity of the bars and stickman
+        # Create equation using these values
+        # Try to find a way to dynamically build the equation form
         c1ax = self.c1ax
         c2ax = self.c2ax
         c3ax = self.c3ax
