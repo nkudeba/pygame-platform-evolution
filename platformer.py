@@ -101,6 +101,8 @@ class Fish(Character):
         # In update loop, get x and y distance to every bar, star, stickman, and platform, as well as the speed/velocity of the bars and stickman
         # Create equation using these values
         # Try to find a way to dynamically build the equation form
+        # After 10 seconds or all the stars are gone, keep top 2 performing fish and kill the others, then generate offspring
+        # Add in random mutations
         c1ax = self.c1ax
         c2ax = self.c2ax
         c3ax = self.c3ax
@@ -169,6 +171,7 @@ players = pygame.sprite.Group()
 # players.add(Stickman(100, HEIGHT - 50))
 fishes = pygame.sprite.Group()
 fishlist = [540, 100, 200, 300]
+#To do - randomize fish starting position but ensure fish are between platforms and not overlapping with stickman or other fish
 for fish in fishlist:
     fishes.add(Fish(fish, HEIGHT-50, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, random.randint (-5, 5) * 0.001, fish_count + 1))
     print(fish_count)
